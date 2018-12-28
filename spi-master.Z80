@@ -1,0 +1,98 @@
+===================================================================
+ADDRESS MACHINE-CODE  #   LABEL:             OPCODE  OPERAND
+===================================================================
+
+
+3F68:   3E 90         #                      LD      A,90H
+3F6A:   D3 03         #                      OUT     (3),A
+3F6C:   3E 40         #                      LD      A,40H
+3F6E:   D3 01         #                      OUT     (1),A
+3F70:   3E FF         #                      LD      A,0FFH
+3F72:   D3 02         #                      OUT     (2),A
+3F74:   3E CF         #                      LD      A,0CFH
+3F76:   D3 83         #                      OUT     (83H),A
+3F78:   3E 4F         #                      LD      A,4FH
+3F7A:   D3 83         #                      OUT     (83H),A
+3F7C:   3E 10         #                      LD      A,10H
+3F7E:   D3 81         #                      OUT     (81H),A
+3F80:                 #   CHK_SLAVE:
+3F80:   CD C9 3F      #                      CALL    3FC9H
+3F83:   3E 41         #                      LD      A,41H
+3F85:   BA            #                      CP      D
+3F86:   20 F8         #                      JR      NZ,3F80H
+3F88:                 #   GET_LENGTH:
+3F88:   CD C9 3F      #                      CALL    3FC9H
+3F8B:   5A            #                      LD      E,D
+3F8C:   CD C9 3F      #                      CALL    3FC9H
+3F8F:   AF            #                      XOR     A
+3F90:   BB            #                      CP      E
+3F91:   20 15         #                      JR      NZ,3FA8H
+3F93:   BA            #                      CP      D
+3F94:   20 12         #                      JR      NZ,3FA8H
+3F96:                 #   END_RECEIVE:
+3F96:   3E CF         #                      LD      A,0CFH
+3F98:   D3 83         #                      OUT     (83H),A
+3F9A:   3E FF         #                      LD      A,0FFH
+3F9C:   D3 83         #                      OUT     (83H),A
+3F9E:   DD 21 C3 3F   #                      LD      IX,3FC3H
+3FA2:   CD FE 05      #                      CALL    5FEH
+3FA5:   C3 00 00      #                      JP      0
+3FA8:                 #   GET_DEST:
+3FA8:   D5            #                      PUSH    DE
+3FA9:   CD C9 3F      #                      CALL    3FC9H
+3FAC:   6A            #                      LD      L,D
+3FAD:   CD C9 3F      #                      CALL    3FC9H
+3FB0:   62            #                      LD      H,D
+3FB1:   D1            #                      POP     DE
+3FB2:                 #   GET_NEXT_BYTE:
+3FB2:   D5            #                      PUSH    DE
+3FB3:                 #   GET_NEXT_BYTE2:
+3FB3:   CD C9 3F      #                      CALL    3FC9H
+3FB6:   72            #                      LD      (HL),D
+3FB7:   23            #                      INC     HL
+3FB8:   D1            #                      POP     DE
+3FB9:   1B            #                      DEC     DE
+3FBA:   AF            #                      XOR     A
+3FBB:   BB            #                      CP      E
+3FBC:   20 F4         #                      JR      NZ,3FB2H
+3FBE:   BA            #                      CP      D
+3FBF:   20 F1         #                      JR      NZ,3FB2H
+3FC1:   18 C5         #                      JR      3F88H
+3FC3:                 #   DONE_TEXT:
+3FC3:   00            #                      DEFB    0
+3FC4:   00            #                      DEFB    0
+3FC5:   8F            #                      DEFB    8FH
+3FC6:   3D            #                      DEFB    3DH
+3FC7:   BD            #                      DEFB    0BDH
+3FC8:   B3            #                      DEFB    0B3H
+3FC9:                 #   RECEIVE_BYTE:
+3FC9:   DB 81         #                      IN      A,(81H)
+3FCB:   CB 5F         #                      BIT     3,A
+3FCD:   20 FA         #                      JR      NZ,3FC9H
+3FCF:   0E 5A         #                      LD      C,5AH
+3FD1:                 #   SEND_BYTE:
+3FD1:   06 08         #                      LD      B,8
+3FD3:   AF            #                      XOR     A
+3FD4:   D3 81         #                      OUT     (81H),A
+3FD6:                 #   BEGIN_SEND:
+3FD6:   CB EF         #                      SET     5,A
+3FD8:   CB 21         #                      SLA     C
+3FDA:   38 02         #                      JR      C,3FDEH
+3FDC:   CB AF         #                      RES     5,A
+3FDE:                 #   SEND_BIT:
+3FDE:   D3 81         #                      OUT     (81H),A
+3FE0:   DB 81         #                      IN      A,(81H)
+3FE2:   37            #                      SCF
+3FE3:   CB 77         #                      BIT     6,A
+3FE5:   20 01         #                      JR      NZ,3FE8H
+3FE7:   3F            #                      CCF
+3FE8:                 #   SAVE_BIT:
+3FE8:   CB 12         #                      RL      D
+3FEA:   CB FF         #                      SET     7,A
+3FEC:   D3 81         #                      OUT     (81H),A
+3FEE:   CB BF         #                      RES     7,A
+3FF0:   D3 81         #                      OUT     (81H),A
+3FF2:   10 E2         #                      DJNZ    3FD6H
+3FF4:   3E 10         #                      LD      A,10H
+3FF6:   D3 81         #                      OUT     (81H),A
+3FF8:   C9            #                      RET
